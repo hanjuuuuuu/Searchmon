@@ -3,6 +3,8 @@ import { SearchOutlined } from '@ant-design/icons';
 import { Input, Row, Col, Radio, Select, Checkbox, Typography, Button, Form, Modal} from 'antd';
 import 'antd/dist/antd.css';
 import React, {useState} from 'react';
+import axios from 'axios'
+
 const { Option } = Select;
 const moment = require('moment')
 
@@ -16,9 +18,25 @@ let month = String(today.getMonth()+1);  //월
 let day = String(today.getDate()-1) ; //일
 
 const App = () => {
-  const [subnum, setSubnum] = useState();
+  const [subnum, setSubnum] = useState(1);
   const [searchnum, setSearchnum] = useState();
   const [form] = Form.useForm();
+
+  const queryTemplete = {
+    startDate: "",
+    endDate: "",
+    timeUnit: "",
+    keywordGroups: [
+        {
+            groupName: "",
+            keywords: []
+            
+        }
+    ],
+    device: "",
+    ages: [],
+    gender: ""
+ } 
 
   const info = () => {    //주제어, 검색어 모두 입력안했을 때 modal 창
     Modal.info({
@@ -36,22 +54,57 @@ const App = () => {
     let getInfo = form.getFieldsValue()
     switch(sub){
       case 'subinput2':
-        console.log(sub)
-        getInfo.subinput = getInfo.subinput1
         setSubnum(1)
+        getInfo.subinput = getInfo.subinput1
         break;
       case 'subinput3':
-        getInfo.subinput = getInfo.subinput2
-        setSubnum(2)
-        break;
+        if(!getInfo.subinput1){
+          setSubnum(1)
+          getInfo.subinput = getInfo.subinput1
+          break;
+        }
+        else{
+          setSubnum(2)
+          getInfo.subinput = getInfo.subinput2
+          break;
+        }
       case 'subinput4':
-        getInfo.subinput = getInfo.subinput3
-        setSubnum(3)
-        break;
+        if(!getInfo.subinput1){
+          setSubnum(1)
+          getInfo.subinput = getInfo.subinput1
+          break;
+        }
+        else if(!getInfo.subinput2){
+          setSubnum(2)
+          getInfo.subinput = getInfo.subinput2
+          break;
+        }
+        else{
+          setSubnum(3)
+          getInfo.subinput = getInfo.subinput3
+          break;
+        }
       case 'subinput5':
-        getInfo.subinput = getInfo.subinput4
-        setSubnum(4)
-        break;
+        if(!getInfo.subinput1){
+          setSubnum(1)
+          getInfo.subinput = getInfo.subinput1
+          break;
+        }
+        else if(!getInfo.subinput2){
+          setSubnum(2)
+          getInfo.subinput = getInfo.subinput2
+          break;
+        }
+        else if(!getInfo.subinput3){
+          setSubnum(3)
+          getInfo.subinput = getInfo.subinput3
+          break;
+        }
+        else{
+          setSubnum(4)
+          getInfo.subinput = getInfo.subinput4
+          break;
+        }
     }
 
     if(!getInfo.subinput){
@@ -59,7 +112,7 @@ const App = () => {
         title: 'searchmon 내용:',
         content: (
           <div>
-            <p>주제어{subnum} 부터 입력해 주시기 바랍니다.</p>
+            <p>주제어{subnum}부터 입력해 주시기 바랍니다.</p>
           </div>
         ),
         onOk() {},
@@ -71,24 +124,24 @@ const App = () => {
     let getInfo = form.getFieldsValue()
     switch(search){
       case 'subinputdata1':
-        getInfo.subinput = getInfo.subinput1 
         setSearchnum(1)
+        getInfo.subinput = getInfo.subinput1 
         break;
       case 'subinputdata2':
-        getInfo.subinput = getInfo.subinput2 
         setSearchnum(2)
+        getInfo.subinput = getInfo.subinput2 
         break;
       case 'subinputdata3':
-        getInfo.subinput = getInfo.subinput3 
         setSearchnum(3)
+        getInfo.subinput = getInfo.subinput3 
         break;
       case 'subinputdata4':
-        getInfo.subinput = getInfo.subinput4 
         setSearchnum(4)
+        getInfo.subinput = getInfo.subinput4 
         break;
       case 'subinputdata5':
-        getInfo.subinput = getInfo.subinput5
         setSearchnum(5)
+        getInfo.subinput = getInfo.subinput5
         break; 
     }
 
@@ -111,8 +164,29 @@ const App = () => {
       info()
     }
     else
-      console.log(JSON.stringify(form.getFieldsValue()))
-    
+      //console.log(form.getFieldsValue())
+  
+      queryTemplete.startDate = "2017-01-01"
+      queryTemplete.endDate = "2017-04-30"
+      queryTemplete.timeUnit = getData.timeUnit
+      queryTemplete.keywordGroups[0].groupName = getData.subinput1
+      queryTemplete.keywordGroups[0].keywords.push("한글", "korean")
+     
+      queryTemplete.device = getData.checkrange
+      queryTemplete.ages.push("1","2")
+      queryTemplete.gender = getData.checkgender
+      
+      console.log(queryTemplete)
+
+
+      axios.post("localhost:8080/hanju", 
+        queryTemplete
+      )
+      .then((response) => {console.log(response.data);
+      })
+      .catch((error) => {console.log(error.response)
+      });
+
   } 
 
   const updatePeriod = (dateFrom) => {  //날짜 문자열 자르기
@@ -163,7 +237,6 @@ const App = () => {
       form={form}
     >
     <div className="site-input-group-wrapper" style={{marginLeft: '30px', marginTop: '50px'}}> 
-    <Form.Item name="subject">
     <Input.Group size="large">
       <Row gutter={8}>
         <Col span={2}>
@@ -176,7 +249,7 @@ const App = () => {
         </Col>
         <Col span={9}>
         <Form.Item name="subinputdata1">
-          <Input placeholder="주제어 1에 해당하는 모든 검색어를 컴마(,)로 구분하여 최대 20개까지 입력" onClick={searchcheck}/>
+          <Input placeholder="주제어 1에 해당하는 모든 검색어를 컴마(,)로 구분하여 최대 20개까지 입력" onFocus={() => searchcheck("subinputdata1")}/>
         </Form.Item>
         </Col>
         <Col span={9}></Col>
@@ -190,12 +263,12 @@ const App = () => {
         </Col>
         <Col span={5}>
         <Form.Item name="subinput2"> 
-          <Input placeholder="주제어 2 입력" onClick={subcheck}/>
+          <Input placeholder="주제어 2 입력" onFocus={() => subcheck("subinput2")} />
         </Form.Item>
         </Col>
         <Col span={9}>
         <Form.Item name="subinputdata2">
-          <Input placeholder="주제어 2에 해당하는 모든 검색어를 컴마(,)로 구분하여 최대 20개까지 입력" onClick={searchcheck}/>
+          <Input placeholder="주제어 2에 해당하는 모든 검색어를 컴마(,)로 구분하여 최대 20개까지 입력" onFocus={() => searchcheck("subinputdata2")}/>
         </Form.Item>
         </Col>
       </Row>
@@ -208,12 +281,12 @@ const App = () => {
         </Col>
         <Col span={5}>
         <Form.Item name="subinput3"> 
-          <Input placeholder="주제어 3 입력" onClick={subcheck}/>
+          <Input placeholder="주제어 3 입력" onFocus={() => subcheck("subinput3")}/>
         </Form.Item>
         </Col>
         <Col span={9}>
         <Form.Item name="subinputdata3">
-          <Input placeholder="주제어 3에 해당하는 모든 검색어를 컴마(,)로 구분하여 최대 20개까지 입력" onClick={searchcheck}/>
+          <Input placeholder="주제어 3에 해당하는 모든 검색어를 컴마(,)로 구분하여 최대 20개까지 입력" onFocus={() => searchcheck("subinputdata3")}/>
         </Form.Item>
         </Col>
       </Row>
@@ -226,12 +299,12 @@ const App = () => {
         </Col>
         <Col span={5}>
         <Form.Item name="subinput4"> 
-          <Input placeholder="주제어 4 입력" onClick={subcheck}/>
+          <Input placeholder="주제어 4 입력" onFocus={() => subcheck("subinput4")}/>
         </Form.Item>
         </Col>
         <Col span={9}>
         <Form.Item name="subinputdata4">
-          <Input placeholder="주제어 4에 해당하는 모든 검색어를 컴마(,)로 구분하여 최대 20개까지 입력" onClick={searchcheck}/>
+          <Input placeholder="주제어 4에 해당하는 모든 검색어를 컴마(,)로 구분하여 최대 20개까지 입력" onFocus={() => searchcheck("subinputdata4")}/>
         </Form.Item>
         </Col>
       </Row>
@@ -244,17 +317,16 @@ const App = () => {
         </Col>
         <Col span={5}>
         <Form.Item name="subinput5"> 
-          <Input placeholder="주제어 5 입력" onClick={subcheck}/>
+          <Input placeholder="주제어 5 입력" onFocus={() => subcheck("subinput5")}/>
         </Form.Item>
         </Col>
         <Col span={9}>
         <Form.Item name="subinputdata5">
-          <Input placeholder="주제어 5에 해당하는 모든 검색어를 컴마(,)로 구분하여 최대 20개까지 입력" onClick={searchcheck}/>
+          <Input placeholder="주제어 5에 해당하는 모든 검색어를 컴마(,)로 구분하여 최대 20개까지 입력" onFocus={() => searchcheck("subinputdata5")}/>
         </Form.Item>
         </Col>
       </Row>
     </Input.Group>
-    </Form.Item>
     <>
     <br />
     <Row gutter={16}>
@@ -270,16 +342,16 @@ const App = () => {
     </Radio.Group>
     </Form.Item>
     <br />
-    <Form.Item name="daterange">
-      <Select defaultValue="일간"
+    <Form.Item name="timeUnit">
+      <Select defaultValue="day"
       style={{
         marginLeft: '30px',
         width: 120,
       }}
       >
-      <Option value="일간">일간</Option>
-      <Option value="주간" onClick={updateLayout}>주간</Option>
-      <Option value="월간" onClick={updateLayout}>월간</Option>
+      <Option value="day">일간</Option>
+      <Option value="week" onClick={updateLayout}>주간</Option>
+      <Option value="month" onClick={updateLayout}>월간</Option>
       </Select>
       </Form.Item>
       </Row>
