@@ -49,7 +49,7 @@ const App = () => {
   const queryTemplete = {
     startDate: "",
     endDate: "",
-    timeUnit: "",
+    timeUnit: "date",
     keywordGroups: [
         {
             groupName: "",
@@ -75,7 +75,7 @@ const App = () => {
     groupName: "",
     keywords: []
     
-},
+  },
     ],
     device: "",
     ages:[],
@@ -274,10 +274,11 @@ const App = () => {
       queryData.keywordGroups[3].keywords.push(fieldData.subinputdata4)
       queryData.keywordGroups[4].groupName = fieldData.subinput5
       queryData.keywordGroups[4].keywords.push(fieldData.subinputdata5)
-     
+
       queryData.device = fieldData.device.join()
-      queryData.ages=[]
-      queryData.ages.push(fieldData.ages.join())
+      for(var i=0; i<fieldData.ages.length; i++){
+        queryData.ages.push(fieldData.ages[i])
+      }
       queryData.gender = fieldData.gender.join()
 
       console.log(queryData)
@@ -287,7 +288,9 @@ const App = () => {
         queryData
       )
       .then((response) => {
+        console.log('_______________response')
         console.log(response.data)
+        console.log('_________________________')
   
         setChartInfo(produce(categoryConfig, draft => {      //chartInfo의 복사본에 response값 대입
           draft.data = []
@@ -312,11 +315,11 @@ const App = () => {
 
   }
 
-  useEffect(() => {
-    console.log("_________________________")
-    console.log(categoryConfig)
-    console.log("_________________________")
-  }, [chartInfo])
+  // useEffect(() => {
+  //   console.log("_________________________")
+  //   console.log(categoryConfig)
+  //   console.log("_________________________")
+  // }, [chartInfo])
 
   return (
     <>
@@ -430,13 +433,13 @@ const App = () => {
     </Form.Item>
     <br />
     <Form.Item name="timeUnit">
-      <Select defaultValue="day"
+      <Select defaultValue="date"
       style={{
         marginLeft: '30px',
         width: 120,
       }}
       >
-      <Option value="day">일간</Option>
+      <Option value="date">일간</Option>
       <Option value="week" >주간</Option>
       <Option value="month" >월간</Option>
       </Select>
