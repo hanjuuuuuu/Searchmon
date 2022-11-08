@@ -22,17 +22,17 @@ const categoryConfig = {data: [
   "ratio": 0,
   "category": ""
   }
- ],
- padding: 'auto',
- xField: 'period',
- yField: 'ratio',
- seriesField: 'category',
- xAxis: {
+],
+padding: 'auto',
+xField: 'period',
+yField: 'ratio',
+seriesField: 'category',
+xAxis: {
    // type: 'timeCat',
-   tickCount: 10,
- },
- colorField: 'type', // or seriesField in some cases
- color: ['#d62728', '#2ca02c', '#efcc2c','#7f4ab9', '#62b9ef'],
+tickCount: 10,
+},
+colorField: 'type', // or seriesField in some cases
+color: ['#d62728', '#2ca02c', '#efcc2c','#7f4ab9', '#62b9ef'],
 }
 
 let today = new Date();
@@ -80,7 +80,7 @@ const App = () => {
     device: "",
     ages:[],
     gender: ""
- } 
+  } 
 
   const info = () => {    //주제어, 검색어 모두 입력안했을 때 modal 창
     Modal.info({
@@ -164,7 +164,7 @@ const App = () => {
     }
   };
 
-  const searchcheck = (search) => {    //주제어를 입력하지 않고 검색어부터 입력하려고 할 때의 modal 창 (searchnum 다시 수정하기)
+  const searchcheck = (search) => {    //주제어를 입력하지 않고 검색어부터 입력하려고 할 때의 modal 창 
     let getInfo = form.getFieldsValue()
     switch(search){
       case 'subinputdata1':
@@ -284,7 +284,7 @@ const App = () => {
       console.log(queryData)
 
 
-      axios.post("http://localhost:8080/hanju", 
+      axios.post("/hanju", 
         queryData
       )
       .then((response) => {
